@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/static/js/vue.js"></script>
+    <script src="/static/js/script.js" ></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  </head>
+  <body>
+    <div id="app">
+      <div class="modal-background active">
+
+        {% load static %}
+
+        <img class="modal-background-gif" src="{% static 'images/background.gif' %}">
+
+        <form 
+          class="modal active" 
+          id="modal-authorisation" 
+          v-show="isAuthorisation" 
+          v-on:submit.prevent="authorisationSubmitForm"
+        >
+          <div class="modal--header">
+            <div class="tabs">
+              <div class="tab" v-on:click="moveRegistration()">
+                Регистрация
+              </div>
+              <div class="divider">
+                /
+              </div>
+              <div class="tab active">
+                Авторизация
+              </div>
+            </div>
+          </div>
+          <div class="modal--body">
+            <input--text name="login" label="Логин"></input--text>
+            <input--text name="password" label="Пароль"></input--text>
+            <div class="modal--field inputField--submit">
+              <input type="submit" value="Авторизоваться">
+            </div>
+
+            <div class="modal-errors" v-show="getAuthorisationErrors">
+              <div class="modal-error" v-for="obj in getAuthorisationErrors">
+                <label>{{l_bracket}} obj.label {{r_bracket}}</label>
+                <p>{{l_bracket}} obj.message {{r_bracket}}</p>
+              </div>
+            </div>
+
+          </div>
+        </form>
+
+        <form class="modal active" id="modal-authorisation" v-show="isRegistration" v-on:submit.prevent="registrationSubmitForm">
+          <div class="modal--header">
+            <div class="tabs">
+              <div class="tab active">
+                Регистрация
+              </div>
+              <div class="divider">
+                /
+              </div>
+              <div class="tab" v-on:click="moveAuthorisation()">
+                Авторизация
+              </div>
+            </div>
+          </div>
+          <div class="modal--body">
+            <input--text name="login" label="Логин"></input--text>
+            <input--text name="password" label="Пароль"></input--text>
+            <input--text name="rep_password" label="Повторите пароль"></input--text>
+            <div class="modal--field inputField--submit">
+              <input type="submit" value="Зарегистрироваться">
+            </div>
+
+            <div class="modal-errors" v-show="getRegistrationErrors">
+              <div class="modal-error" v-for="obj in getRegistrationErrors">
+                <label>{{l_bracket}} obj.label {{r_bracket}}</label>
+                <p>{{l_bracket}} obj.message {{r_bracket}}</p>
+              </div>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      (()=>{
+        const REGISTRATION = "registration";
+        const AUTHORISATION = "authorisation";
+
+        new Vue({
+          el: '#app',
+          data: {
+            console: console,
+            registrationMessages: {},
+            authorisationMessages: {},
+            status: AUTHORISATION
+          },
+          computed: {
+            isRegistration(){
+              return this.status == REGISTRATION;
+            },
+            isAuthorisation(){
+              return this.status == AUTHORISATION;
+            },
+            getRegistrationErrors(){
+              return this.getErrorsList(this.registrationMessages);
+            },
+            getAuthorisationErrors(){
+              return this.getErrorsList(this.authorisationMessages);
+            },
+          },
+          methods: {
+            getErrorsList(errors){
+              let data = [];
+              let keys = Object.keys(errors);
+              keys.map((key, index) => {
+                let label = "";
+                let message = errors[key];
+
+                if(key == "login"){
+                  label = "Логин";
+                }
+                else if(key == "password"){
+                  label = "Пароль"
+                }
+                else if(key == "message"){
+                  label = "Ошибка"
+                }
+                else if(key == "rep_password"){
+                  label = "Пароль"
+                }
+
+                data.push({
+                  "label": label,
+                  "message": message
+                })
+
+              });
+              return data;
+            },
+            moveRegistration(){
+              this.changeStatus(REGISTRATION);
+            },
+            moveAuthorisation(){
+              this.changeStatus(AUTHORISATION);
+            },
+            setRegistrationMessage(data){
+              this.registrationMessages = data;
+            },
+            setAuthorisationMessage(data){
+              this.authorisationMessages = data;
+            },
+            changeStatus(type){
+              this.status = type;
+            },
+            authorisationSubmitForm(event){
+              let data = collectFormData(event.target);
+
+              let params = new URLSearchParams(location.search);
+              let redirect = params.get("redirect_to");
+
+              data.append("type", "auth");
+              data.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+              data.append("redirect", redirect)
+
+              request("", "POST", data)
+              .then((value)=>{
+                if(value.result == false){
+                  if(value.errors){
+                    this.setAuthorisationMessage(value.errors);
+                  }
+                }
+                else{
+                  if(value.redirect){
+                    document.location = value.redirect;
+                  }
+                }
+              })
+              .catch((reason)=>{
+
+              });
+
+              return false;
+            },
+            registrationSubmitForm(event){
+              let data = collectFormData(event.target);
+
+              let params = new URLSearchParams(location.search);
+              let redirect = params.get("redirect_to");
+              
+              data.append("redirect", redirect)
+              data.append("type", "reg");
+              data.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+
+              request("", "POST", data)
+              .then((value)=>{
+                if(value.result == false){
+                  if(value.errors){
+                    this.setRegistrationMessage(value.errors);
+                  }
+                }
+                else{
+                  if(value.redirect){
+                    document.location = value.redirect;
+                  }
+                }
+              })
+              .catch((reason)=>{
+                console.log("Error?");
+                console.log(reason);
+              });
+
+              return false;
+            }
+          },
+        })
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,150 @@
+.modal-background{
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    overflow-y: auto;
+}
+
+.modal-background.active{
+    display: block;
+}
+
+.modal {
+    display: none;
+    border-radius: 7px;
+    margin: auto;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.modal.active{
+    display: block;
+}
+
+.modal--header{
+    padding: 10px;
+}
+
+.modal--body{
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.modal--field{
+    margin-bottom: 10px;
+}
+
+.modal--field:last-child{
+    margin-bottom: 0;
+}
+
+.modal-error label, .modal-error p {
+    color: black;
+    margin: 0;
+}
+
+.modal-error label {
+    font-weight: bold;
+}
+
+.modal-error {
+    margin-bottom: 10px;
+}
+
+.modal-error:last-child{
+    margin-bottom: 0;
+}
+
+.inputField--text{
+    position: relative;
+    border: 1px solid #FF0D0D;
+    border-radius: 4px;
+}
+
+.inputField--text span{
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    font-size: 17px;
+    transition: all .5s;
+    padding: 0px 5px 0px 5px;
+    pointer-events: none;
+    cursor: default;
+}
+
+.inputField--text input{
+    width: calc(100% - 5px);
+    padding: 0;
+    border: 0;
+    padding-top: 10px;
+    height: 20px;
+    padding-left: 5px;
+    border-radius: 2px;
+}
+
+.inputField--text input:focus{
+    outline: none;
+}
+
+.inputField--text.active span{
+    font-size: 12px;
+    top: 0;
+    bottom: unset;
+}
+
+.inputField--submit input{
+    width: 100%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 0;
+    background: #FF0D0D;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+}
+
+.inputField--submit input:hover{
+    filter: contrast(0.7);
+}
+
+#modal-authorisation{
+    max-width: 300px;
+    background: white;
+    min-height: 50px;
+    position: relative;
+}
+
+#modal-authorisation .tabs{
+    display: flex;
+    justify-content: flex-end;
+}
+
+#modal-authorisation .tab{
+    color: black;
+    cursor: pointer;
+}
+
+#modal-authorisation .divider{
+    color: black;
+    margin-left: 5px;
+    margin-right: 5px;
+    cursor: default;
+}
+
+#modal-authorisation .tab.active{
+    border-bottom: 1px solid black;
+    cursor: default;
+}
+
+.modal-background-gif{
+    position: fixed;
+    min-width: 100%;
+    min-height: 100%;
+    left: 0;
+    top: 0;
+    filter: brightness(0.15);
+}
